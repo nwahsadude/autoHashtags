@@ -3,8 +3,10 @@ let multer = require('multer');
 let axios = require('axios');
 let _ = require('lodash');
 const upload = multer();
-
+const DEFAULT_PORT = 3000;
 let keys = require("./keys");
+
+
 
 let app = express();
 
@@ -22,29 +24,16 @@ app.post('/uploads', upload.single('image'), function (req, res) {
     });
 });
 
+app.set("port", process.env.PORT || DEFAULT_PORT);
 
-
-app.listen(3000, () => console.log('Example app listening on port 3000!'));
+app.listen(app.get("port"));
 
 
 var mostPopularHashTags = [];
 
 function processImage(image) {
-    // **********************************************
-    // *** Update or verify the following values. ***
-    // **********************************************
-
-    // Replace the subscriptionKey string value with your valid subscription key.
     var subscriptionKey = keys.mKey;
 
-    // Replace or verify the region.
-    //
-    // You must use the same region in your REST API call as you used to obtain your subscription keys.
-    // For example, if you obtained your subscription keys from the westus region, replace
-    // "westcentralus" in the URI below with "westus".
-    //
-    // NOTE: Free trial subscription keys are generated in the westcentralus region, so if you are using
-    // a free trial subscription key, you should not need to change this region.
     var uriBase = "https://eastus.api.cognitive.microsoft.com/vision/v1.0/analyze";
 
     // Request parameters.
@@ -53,8 +42,6 @@ function processImage(image) {
         "details": "",
         "language": "en"
     };
-
-
 
     function toArrayBuffer(buf) {
         var ab = new ArrayBuffer(buf.length);
