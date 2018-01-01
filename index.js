@@ -23,6 +23,9 @@ app.get('/', function (req, res) {
 
 app.post('/uploads', upload.single('image'), function (req, res) {
 
+
+
+
     processImage(req.file.buffer).then((data) => {
         res.send(data)
     }).catch((error)=> {
@@ -68,39 +71,37 @@ function processImage(image) {
         params: params
     }).then((response) => {
 
-        var b = response
+
+        // let b = response;
+
+        let promiseArray = response.data.description.tags.map( tag => getHashTagsFromInstagram(tag) );
+        return Promise.all( promiseArray )
+            .then(
+                results => {
+
+                    return {hashTags: _.flatten(results),
+                    tags: response.data.description.tags};
+
+                }
+            )
+            .catch((error) => {
+                return "Failed to get hashtags"
+            })
 
 
-        // let promiseArray = response.data.description.tags.map( tag => getHashTagsFromInstagram(tag) );
-        // return Promise.all( promiseArray )
-        //     .then(
-        //         results => {
+
+
+
+        // return getHashTagsFromInstagram(response.data.description.tags[0]).then((response) => {
         //
-        //             // console.log(results)
+        //     let a = {hashTags: _.flatten(response),
+        //         tags: b.data.description.tags};
         //
-        //             let a = {hashTags: _.flatten(results),
-        //             tags: response.data.description.tags};
-        //
-        //             return a
-        //
-        //         }
-        //     )
-        //     .catch(console.log)
-
-
-
-
-
-        return getHashTagsFromInstagram(response.data.description.tags[0]).then((response) => {
-
-            let a = {hashTags: _.flatten(response),
-                tags: b.data.description.tags};
-
-            return a
-        }).catch((error) => {
-           console.log(error);
-           return "Error Error ERROR"
-        });
+        //     return a
+        // }).catch((error) => {
+        //    console.log(error);
+        //    return "Error Error ERROR"
+        // });
 
 
     }).catch((error) => {
